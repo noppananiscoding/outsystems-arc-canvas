@@ -280,8 +280,8 @@ export default function ArchitectureCanvas() {
             style={{ zIndex: 1, position: 'relative' }}
           >
             <Background variant={BackgroundVariant.Dots} gap={24} size={1} color="#374151" />
-            <Controls className="!bg-gray-800 !border-gray-700" />
-            <MiniMap className="!bg-gray-800 !border-gray-700" nodeColor="#374151" />
+            <Controls />
+            <MiniMap nodeColor="#374151" maskColor="rgba(99,102,241,0.12)" />
           </ReactFlow>
         </div>
         {showValidation && (
