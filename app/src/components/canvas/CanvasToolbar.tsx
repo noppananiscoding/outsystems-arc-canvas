@@ -68,7 +68,7 @@ export default function CanvasToolbar({
   };
 
   return (
-    <div className="flex items-center gap-2 px-4 py-2 bg-gray-900 border-b border-gray-700 z-50 relative flex-wrap">
+    <div className="fixed top-0 left-0 right-0 flex items-center gap-2 px-4 py-2 bg-gray-900 border-b border-gray-700 z-50 flex-wrap">
 
       {/* Project name */}
       <div className="flex items-center gap-2 flex-shrink-0">

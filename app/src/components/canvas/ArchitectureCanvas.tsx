@@ -236,7 +236,7 @@ export default function ArchitectureCanvas() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-950">
+    <div className="flex flex-col h-screen bg-gray-950 pt-[44px]">
       {/* Hidden SVG defs for edge arrowhead markers — P1 fix */}
       <svg style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden' }}>
         <defs>
