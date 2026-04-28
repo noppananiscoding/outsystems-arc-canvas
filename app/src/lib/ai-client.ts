@@ -5,6 +5,9 @@ export interface AIMessage {
   content: string;
 }
 
+/** Max tokens returned per response — keeps costs low and responses focused */
+const MAX_OUTPUT_TOKENS = 1024;
+
 /**
  * Streams AI chat responses, yielding text chunks as they arrive.
  * All calls happen server-side (via Next.js API route) so no browser
@@ -34,7 +37,11 @@ async function* streamGemini(
 ): AsyncGenerator<string> {
   const { GoogleGenerativeAI } = await import('@google/generative-ai');
   const genAI = new GoogleGenerativeAI(apiKey);
-  const geminiModel = genAI.getGenerativeModel({ model, systemInstruction: systemPrompt });
+  const geminiModel = genAI.getGenerativeModel({
+    model,
+    systemInstruction: systemPrompt,
+    generationConfig: { maxOutputTokens: MAX_OUTPUT_TOKENS },
+  });
 
   // Gemini history excludes the last user message (sent separately)
   const history = messages.slice(0, -1).map(m => ({
@@ -63,6 +70,7 @@ async function* streamOpenAI(
   const stream = await client.chat.completions.create({
     model,
     stream: true,
+    max_tokens: MAX_OUTPUT_TOKENS,
     messages: [
       { role: 'system', content: systemPrompt },
       ...messages.map(m => ({ role: m.role, content: m.content })),
@@ -85,7 +93,7 @@ async function* streamAnthropic(
 
   const stream = client.messages.stream({
     model,
-    max_tokens: 2048,
+    max_tokens: MAX_OUTPUT_TOKENS,
     system: systemPrompt,
     messages: messages.map(m => ({ role: m.role, content: m.content })),
   });
