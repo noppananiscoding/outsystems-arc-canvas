@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { BookOpen, X } from 'lucide-react';
+import { BookOpen, X, Check, ShieldCheck, ShieldX, AlertTriangle } from 'lucide-react';
 
 interface GuidelinesPanelProps {
   open: boolean;
@@ -154,7 +154,7 @@ function ModuleNamingTab() {
         </table>
       </div>
       <div className="bg-amber-900/20 border border-amber-700/40 rounded-lg px-3 py-2 text-xs text-amber-200">
-        <span className="font-semibold">⚠ Special Case:</span>{' '}
+              <span className="flex items-center gap-1 font-semibold"><AlertTriangle size={12} className="text-amber-400" /> Special Case:</span>{' '}
         <code>StyleGuide_UI</code> is technically a <code>_UI</code> suffix but lives in the{' '}
         <strong>Foundation</strong> layer. The system auto-detects this by module name.
       </div>
@@ -185,7 +185,7 @@ function DependencyRulesTab() {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-sm font-semibold text-emerald-400 uppercase tracking-wider mb-3">✅ Allowed Dependencies</h3>
+        <h3 className="flex items-center gap-1.5 text-sm font-semibold text-emerald-400 uppercase tracking-wider mb-3"><ShieldCheck size={14} /> Allowed Dependencies</h3>
         <table className="w-full text-xs">
           <thead>
             <tr className="text-gray-400 border-b border-white/10">
@@ -209,7 +209,7 @@ function DependencyRulesTab() {
       </div>
 
       <div>
-        <h3 className="text-sm font-semibold text-red-400 uppercase tracking-wider mb-3">❌ Forbidden Dependencies</h3>
+        <h3 className="flex items-center gap-1.5 text-sm font-semibold text-red-400 uppercase tracking-wider mb-3"><ShieldX size={14} /> Forbidden Dependencies</h3>
         <table className="w-full text-xs">
           <thead>
             <tr className="text-gray-400 border-b border-white/10">
@@ -355,7 +355,7 @@ function BestPracticesTab() {
           <ul className="space-y-1.5">
             {section.items.map((item, i) => (
               <li key={i} className="flex items-start gap-2 text-xs text-gray-300">
-                <span className="text-emerald-400 mt-0.5 flex-shrink-0">✓</span>
+                <Check size={12} className="text-emerald-400 mt-0.5 flex-shrink-0" />
                 <span>{item}</span>
               </li>
             ))}

@@ -87,7 +87,7 @@ export default function CanvasToolbar({
           onClick={() => setShowSampleMenu(v => !v)}
           className="flex items-center gap-1.5 bg-gray-700 hover:bg-gray-600 text-white text-sm px-3 py-1.5 rounded transition-colors"
         >
-          <Layers size={14} /> Samples <ChevronDown size={12} />
+          <Layers size={14} /> Samples <ChevronDown size={12} className="ml-1" />
         </button>
         {showSampleMenu && (
           <div className="absolute top-full left-0 mt-1 w-72 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50 overflow-hidden">
