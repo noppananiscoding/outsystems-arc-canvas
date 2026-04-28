@@ -120,7 +120,7 @@ export const useArchitectureStore = create<ArchitectureStore>()(
       aiMode: false,
       aiProvider: 'gemini' as AIProvider,
       aiApiKey: (typeof window !== 'undefined' ? localStorage.getItem('ai_api_key') : null) ?? '',
-      aiModel: 'gemini-2.0-flash',
+      aiModel: 'gemini-2.5-flash',
 
       setProjectName: (name) => set({ projectName: name }),
 
@@ -226,7 +226,7 @@ export const useArchitectureStore = create<ArchitectureStore>()(
         if (typeof window !== 'undefined') {
           localStorage.removeItem('ai_api_key');
         }
-        set({ aiMode: false, aiProvider: 'gemini', aiModel: 'gemini-2.0-flash', aiApiKey: '' });
+        set({ aiMode: false, aiProvider: 'gemini', aiModel: 'gemini-2.5-flash', aiApiKey: '' });
       },
     }),
     {

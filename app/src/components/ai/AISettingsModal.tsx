@@ -18,11 +18,11 @@ const PROVIDERS: { value: AIProvider; label: string; keyPage: string }[] = [
 
 const MODELS: Record<AIProvider, { value: string; label: string; tier?: string }[]> = {
   gemini: [
-    { value: 'gemini-2.0-flash',              label: 'Gemini 2.0 Flash',             tier: 'Free' },
-    { value: 'gemini-2.0-flash-lite',          label: 'Gemini 2.0 Flash Lite',        tier: 'Free' },
-    { value: 'gemini-1.5-flash',               label: 'Gemini 1.5 Flash',             tier: 'Free' },
-    { value: 'gemini-1.5-flash-8b',            label: 'Gemini 1.5 Flash 8B',          tier: 'Free' },
-    { value: 'gemini-2.5-flash-preview-04-17', label: 'Gemini 2.5 Flash Preview',     tier: 'Free' },
+    { value: 'gemini-2.5-flash',      label: 'Gemini 2.5 Flash (Recommended)', tier: 'Free' },
+    { value: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite',          tier: 'Free' },
+    { value: 'gemini-2.5-pro',        label: 'Gemini 2.5 Pro',                 tier: 'Paid' },
+    { value: 'gemini-3-flash-preview',label: 'Gemini 3 Flash Preview',         tier: 'Free' },
+    { value: 'gemini-3-pro-preview',  label: 'Gemini 3 Pro Preview',           tier: 'Paid' },
   ],
   openai: [
     { value: 'gpt-4o-mini', label: 'GPT-4o Mini (Recommended)' },
