@@ -135,9 +135,9 @@ export default function AIGenerateDialog({
           <div className="px-5 py-5 space-y-4">
             {/* Error banner */}
             {error && (
-              <div className="bg-red-950/50 border border-red-700/50 rounded-lg px-4 py-3 flex items-start gap-2">
+              <div className="bg-red-950/50 border border-red-700/50 rounded-lg px-4 py-3 flex items-start gap-2 min-w-0">
                 <AlertTriangle size={14} className="text-red-400 flex-shrink-0 mt-0.5" />
-                <p className="text-red-300 text-sm">{error}</p>
+                <p className="text-red-300 text-sm break-words min-w-0 flex-1">{error}</p>
               </div>
             )}
 
