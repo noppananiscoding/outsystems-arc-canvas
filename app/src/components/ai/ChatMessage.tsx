@@ -17,7 +17,8 @@ interface ChatMessageProps {
 
 /** Very lightweight markdown renderer — handles bold, italic, inline code, and line breaks */
 function renderMarkdown(text: string): React.ReactNode {
-  const lines = text.split('\n');
+  // Trim leading/trailing whitespace to avoid blank spans at top/bottom
+  const lines = text.trimStart().split('\n');
   const elements: React.ReactNode[] = [];
 
   lines.forEach((line, lineIdx) => {
@@ -59,9 +60,9 @@ function renderMarkdown(text: string): React.ReactNode {
     }
 
     elements.push(
-      <span key={lineIdx}>
+      <span key={lineIdx} style={line === '' ? { display: 'block', height: '0.5em' } : undefined}>
         {parts}
-        {lineIdx < lines.length - 1 && <br />}
+        {lineIdx < lines.length - 1 && line !== '' && <br />}
       </span>
     );
   });
@@ -108,7 +109,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
               <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce [animation-delay:300ms]" />
             </span>
           ) : (
-            <div style={{ overflowWrap: 'anywhere' }}>{renderMarkdown(message.content)}</div>
+            <div style={{ overflowWrap: 'anywhere' }}>{renderMarkdown(message.content.trimStart())}</div>
           )}
         </div>
 
