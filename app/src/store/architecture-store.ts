@@ -9,6 +9,8 @@ import { detectAntiPatterns } from '@/lib/anti-patterns';
 import { exportToJSON } from '@/lib/import-export';
 import { getDefaultChecklist } from '@/lib/checklist-utils';
 
+export type AIProvider = 'gemini' | 'openai' | 'anthropic';
+
 function buildSampleModules(): Module[] {
   const makeModule = (name: string, suffix: ModuleSuffix, x: number, y: number, description: string, ownedEntities: string[] = []): Module => {
     const { layer, track } = deriveLayerAndTrack(suffix, name);
@@ -79,6 +81,13 @@ interface ArchitectureStore {
   violations: ValidationViolation[];
   selectedModuleId: string | null;
   isInitialized: boolean;
+
+  // AI Mode
+  aiMode: boolean;
+  aiProvider: AIProvider;
+  aiApiKey: string;
+  aiModel: string;
+
   setProjectName: (name: string) => void;
   addModule: (module: Omit<Module, 'id'>) => void;
   updateModule: (id: string, updates: Partial<Module>) => void;
@@ -90,6 +99,11 @@ interface ArchitectureStore {
   importArchitecture: (file: ArchitectureFile) => void;
   exportArchitecture: () => ArchitectureFile;
   loadSampleData: () => void;
+
+  // AI actions
+  setAiMode: (enabled: boolean) => void;
+  setAiConfig: (provider: AIProvider, apiKey: string, model: string) => void;
+  clearAiConfig: () => void;
 }
 
 export const useArchitectureStore = create<ArchitectureStore>()(
@@ -101,6 +115,12 @@ export const useArchitectureStore = create<ArchitectureStore>()(
       violations: [],
       selectedModuleId: null,
       isInitialized: false,
+
+      // AI defaults
+      aiMode: false,
+      aiProvider: 'gemini' as AIProvider,
+      aiApiKey: (typeof window !== 'undefined' ? localStorage.getItem('ai_api_key') : null) ?? '',
+      aiModel: 'gemini-2.0-flash',
 
       setProjectName: (name) => set({ projectName: name }),
 
@@ -191,12 +211,47 @@ export const useArchitectureStore = create<ArchitectureStore>()(
         set({ modules: sampleModules, dependencies: sampleDeps, isInitialized: true });
         get().validateAll();
       },
+
+      // AI actions
+      setAiMode: (enabled) => set({ aiMode: enabled }),
+
+      setAiConfig: (provider, apiKey, model) => {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('ai_api_key', apiKey);
+        }
+        set({ aiProvider: provider, aiModel: model, aiApiKey: apiKey, aiMode: true });
+      },
+
+      clearAiConfig: () => {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('ai_api_key');
+        }
+        set({ aiMode: false, aiProvider: 'gemini', aiModel: 'gemini-2.0-flash', aiApiKey: '' });
+      },
     }),
     {
       name: 'outsystems-architecture',
+      partialize: (state) => ({
+        projectName: state.projectName,
+        modules: state.modules,
+        dependencies: state.dependencies,
+        violations: state.violations,
+        selectedModuleId: state.selectedModuleId,
+        isInitialized: state.isInitialized,
+        aiMode: state.aiMode,
+        aiProvider: state.aiProvider,
+        aiModel: state.aiModel,
+        // aiApiKey intentionally excluded — stored separately in localStorage
+      }),
       onRehydrateStorage: () => (state) => {
-        if (state && !state.isInitialized && state.modules.length === 0) {
-          state.loadSampleData();
+        if (state) {
+          // Restore apiKey from its own localStorage key
+          if (typeof window !== 'undefined') {
+            state.aiApiKey = localStorage.getItem('ai_api_key') ?? '';
+          }
+          if (!state.isInitialized && state.modules.length === 0) {
+            state.loadSampleData();
+          }
         }
       },
     }

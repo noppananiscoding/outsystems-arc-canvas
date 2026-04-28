@@ -19,6 +19,7 @@ import ModuleForm from '../modules/ModuleForm';
 import ValidationPanel from '../validation/ValidationPanel';
 import KeyboardShortcutsHelp from './KeyboardShortcutsHelp';
 import GuidelinesPanel from '../guidelines/GuidelinesPanel';
+import AICopilotPanel from '../ai/AICopilotPanel';
 
 const nodeTypes: NodeTypes = { moduleNode: ModuleNode };
 const edgeTypes: EdgeTypes = { dependencyEdge: DependencyEdge };
@@ -28,13 +29,14 @@ export default function ArchitectureCanvas() {
     modules, dependencies, selectedModuleId,
     addDependency, deleteDependency, loadSampleData, isInitialized,
     validateAll, updateModule, selectModule, deleteModule,
-    projectName,
+    projectName, violations, aiMode,
   } = useArchitectureStore();
 
   const [showForm, setShowForm] = useState(false);
   const [showValidation, setShowValidation] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [showGuidelines, setShowGuidelines] = useState(false);
+  const [showAIPanel, setShowAIPanel] = useState(false);
   const [editingModule, setEditingModule] = useState<Module | undefined>(undefined);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   // Tracks the currently-selected edge ID so Del/Backspace can delete it
@@ -98,6 +100,15 @@ export default function ArchitectureCanvas() {
         return;
       }
 
+      // A — toggle AI copilot (only if AI mode is on)
+      if (e.key === 'a' || e.key === 'A') {
+        if (aiMode) {
+          e.preventDefault();
+          setShowAIPanel(v => !v);
+        }
+        return;
+      }
+
       // N — new module
       if (e.key === 'n' || e.key === 'N') {
         e.preventDefault();
@@ -148,7 +159,7 @@ export default function ArchitectureCanvas() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedModuleId, selectedEdgeId, modules, showForm, handleExport, validateAll, deleteDependency]);
+  }, [selectedModuleId, selectedEdgeId, modules, showForm, handleExport, validateAll, deleteDependency, aiMode]);
 
   const nodes: Node[] = useMemo(() => modules.map(m => ({
     id: m.id,
@@ -241,6 +252,7 @@ export default function ArchitectureCanvas() {
         onExport={handleExport}
         onToggleShortcuts={() => setShowShortcuts(v => !v)}
         onOpenGuidelines={() => setShowGuidelines(true)}
+        onOpenAI={() => setShowAIPanel(true)}
       />
 
       <div className="flex flex-1 overflow-hidden relative">
@@ -321,6 +333,15 @@ export default function ArchitectureCanvas() {
 
       {/* Architecture Guidelines slide-over */}
       <GuidelinesPanel open={showGuidelines} onClose={() => setShowGuidelines(false)} />
+
+      {/* AI Copilot Panel */}
+      <AICopilotPanel
+        open={showAIPanel && aiMode}
+        onClose={() => setShowAIPanel(false)}
+        modules={modules}
+        violations={violations}
+        projectName={projectName}
+      />
     </div>
   );
 }

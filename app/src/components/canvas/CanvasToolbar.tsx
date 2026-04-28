@@ -5,6 +5,7 @@ import { importFromJSON } from '@/lib/import-export';
 import { BEST_PRACTICES_ARCHITECTURE, ANTI_PATTERN_SHOWCASE } from '@/lib/sample-architectures';
 import { toast } from 'sonner';
 import { Download, Upload, Plus, CheckSquare, BookOpen, ChevronDown, Keyboard, Layers, ShieldCheck, AlertCircle } from 'lucide-react';
+import AIModeToggle from '../ai/AIModeToggle';
 
 interface CanvasToolbarProps {
   onAddModule: () => void;
@@ -13,6 +14,7 @@ interface CanvasToolbarProps {
   onExport: () => void;
   onToggleShortcuts: () => void;
   onOpenGuidelines: () => void;
+  onOpenAI: () => void;
 }
 
 export default function CanvasToolbar({
@@ -22,6 +24,7 @@ export default function CanvasToolbar({
   onExport,
   onToggleShortcuts,
   onOpenGuidelines,
+  onOpenAI,
 }: CanvasToolbarProps) {
   const { projectName, violations, setProjectName, importArchitecture, validateAll } = useArchitectureStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -162,6 +165,12 @@ export default function CanvasToolbar({
         <Keyboard size={14} />
         <span className="text-xs font-mono font-bold">?</span>
       </button>
+
+      {/* Vertical divider */}
+      <div className="h-5 w-px bg-gray-700" />
+
+      {/* AI Mode Toggle */}
+      <AIModeToggle onOpenCopilot={onOpenAI} />
     </div>
   );
 }
