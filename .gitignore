@@ -39,3 +39,8 @@ Thumbs.db
 # TypeScript
 *.tsbuildinfo
 app/next-env.d.ts
+
+# Project management / AI agent context (local only)
+.github/
+AGENT.md
+Claude.md
