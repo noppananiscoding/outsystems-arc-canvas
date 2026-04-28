@@ -70,13 +70,13 @@ export default function CanvasToolbar({
         />
       </div>
       <div className="h-5 w-px bg-gray-700" />
-      <button onClick={onAddModule} className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1.5 rounded transition-colors">
+      <button onClick={onAddModule} className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1.5 rounded transition-colors cursor-pointer">
         <Plus size={14} /> Add Module
       </button>
-      <button onClick={onExport} className="flex items-center gap-1.5 bg-gray-700 hover:bg-gray-600 text-white text-sm px-3 py-1.5 rounded transition-colors">
+      <button onClick={onExport} className="flex items-center gap-1.5 bg-gray-700 hover:bg-gray-600 text-white text-sm px-3 py-1.5 rounded transition-colors cursor-pointer">
         <Download size={14} /> Export
       </button>
-      <button onClick={() => fileInputRef.current?.click()} className="flex items-center gap-1.5 bg-gray-700 hover:bg-gray-600 text-white text-sm px-3 py-1.5 rounded transition-colors">
+      <button onClick={() => fileInputRef.current?.click()} className="flex items-center gap-1.5 bg-gray-700 hover:bg-gray-600 text-white text-sm px-3 py-1.5 rounded transition-colors cursor-pointer">
         <Upload size={14} /> Import
       </button>
       <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleImport} />
@@ -85,7 +85,7 @@ export default function CanvasToolbar({
       <div className="relative" ref={samplesMenuRef}>
         <button
           onClick={() => setShowSampleMenu(v => !v)}
-          className="flex items-center gap-1.5 bg-gray-700 hover:bg-gray-600 text-white text-sm px-3 py-1.5 rounded transition-colors"
+          className="flex items-center gap-1.5 bg-gray-700 hover:bg-gray-600 text-white text-sm px-3 py-1.5 rounded transition-colors cursor-pointer"
         >
           <Layers size={14} /> Samples <ChevronDown size={12} className="ml-1" />
         </button>
@@ -102,7 +102,7 @@ export default function CanvasToolbar({
                 setShowSampleMenu(false);
                 toast.success('Loaded: Best Practices Reference Architecture');
               }}
-              className="w-full text-left px-4 py-3 hover:bg-gray-700 transition-colors border-b border-gray-700/50"
+              className="w-full text-left px-4 py-3 hover:bg-gray-700 transition-colors border-b border-gray-700/50 cursor-pointer"
             >
               <div className="flex items-center gap-2 mb-0.5">
                 <ShieldCheck size={14} className="text-emerald-400 flex-shrink-0" />
@@ -117,7 +117,7 @@ export default function CanvasToolbar({
                 setShowSampleMenu(false);
                 toast.success('Loaded: Anti-Pattern Showcase — check the Validation panel!');
               }}
-              className="w-full text-left px-4 py-3 hover:bg-gray-700 transition-colors"
+              className="w-full text-left px-4 py-3 hover:bg-gray-700 transition-colors cursor-pointer"
             >
               <div className="flex items-center gap-2 mb-0.5">
                 <AlertCircle size={14} className="text-red-400 flex-shrink-0" />
@@ -131,7 +131,7 @@ export default function CanvasToolbar({
 
       <button
         onClick={() => { validateAll(); onToggleValidation(); }}
-        className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded transition-colors ${showValidation ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-gray-700 hover:bg-gray-600'} text-white`}
+        className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded transition-colors cursor-pointer ${showValidation ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-gray-700 hover:bg-gray-600'} text-white`}
       >
         <CheckSquare size={14} /> Validate
         {(errorCount > 0 || warnCount > 0) && (
@@ -145,7 +145,7 @@ export default function CanvasToolbar({
       <button
         onClick={onOpenGuidelines}
         title="Architecture Guidelines (G)"
-        className="flex items-center gap-1.5 bg-gray-700 hover:bg-gray-600 text-white text-sm px-3 py-1.5 rounded transition-colors"
+        className="flex items-center gap-1.5 bg-gray-700 hover:bg-gray-600 text-white text-sm px-3 py-1.5 rounded transition-colors cursor-pointer"
       >
         <BookOpen size={14} /> Guidelines
       </button>
@@ -157,7 +157,7 @@ export default function CanvasToolbar({
       <button
         onClick={onToggleShortcuts}
         title="Keyboard shortcuts (?)"
-        className="flex items-center gap-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white text-sm px-2.5 py-1.5 rounded transition-colors"
+        className="flex items-center gap-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white text-sm px-2.5 py-1.5 rounded transition-colors cursor-pointer"
       >
         <Keyboard size={14} />
         <span className="text-xs font-mono font-bold">?</span>

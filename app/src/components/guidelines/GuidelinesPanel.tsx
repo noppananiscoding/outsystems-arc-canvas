@@ -392,7 +392,7 @@ export default function GuidelinesPanel({ open, onClose }: GuidelinesPanelProps)
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors p-1 rounded hover:bg-gray-700"
+            className="text-gray-400 hover:text-white transition-colors p-1 rounded hover:bg-gray-700 cursor-pointer"
             aria-label="Close guidelines"
           >
             <X size={18} />
@@ -405,7 +405,7 @@ export default function GuidelinesPanel({ open, onClose }: GuidelinesPanelProps)
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2.5 text-xs font-medium whitespace-nowrap transition-colors border-b-2 -mb-px ${
+              className={`px-4 py-2.5 text-xs font-medium whitespace-nowrap transition-colors border-b-2 -mb-px cursor-pointer ${
                 activeTab === tab.id
                   ? 'text-indigo-400 border-indigo-400'
                   : 'text-gray-400 border-transparent hover:text-gray-200 hover:border-gray-500'

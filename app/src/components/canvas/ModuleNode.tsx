@@ -36,7 +36,7 @@ function ModuleNode({ data, selected }: NodeProps<ModuleNodeData>) {
           <span className="text-white text-sm font-semibold leading-tight break-all">{data.name}</span>
           <button
             onClick={(e) => { e.stopPropagation(); deleteModule(data.id); }}
-            className="text-gray-500 hover:text-red-400 flex-shrink-0 mt-0.5"
+            className="text-gray-500 hover:text-red-400 flex-shrink-0 mt-0.5 cursor-pointer"
           >
             <Trash2 size={12} />
           </button>

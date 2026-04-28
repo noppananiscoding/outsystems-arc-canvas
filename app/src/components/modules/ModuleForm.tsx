@@ -63,7 +63,7 @@ export default function ModuleForm({ module, onClose }: ModuleFormProps) {
     <div className="fixed inset-y-0 right-0 w-[480px] bg-gray-900 border-l border-gray-700 shadow-2xl z-[100] flex flex-col">
       <div className="flex items-center justify-between px-5 py-4 border-b border-gray-700">
         <h2 className="text-white font-semibold text-lg">{module ? 'Edit Module' : 'Add Module'}</h2>
-        <button onClick={onClose} className="text-gray-400 hover:text-white"><X size={20} /></button>
+        <button onClick={onClose} className="text-gray-400 hover:text-white cursor-pointer"><X size={20} /></button>
       </div>
 
       {/* A) Required fields hint banner */}
@@ -108,7 +108,7 @@ export default function ModuleForm({ module, onClose }: ModuleFormProps) {
         <div>
           <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Module Type</label>
           <div className="relative">
-            <select value={suffix} onChange={e => setSuffix(e.target.value as ModuleSuffix)} className="w-full appearance-none bg-gray-800 text-white pl-3 pr-9 py-2 rounded border border-gray-600 focus:outline-none focus:border-blue-500 text-sm">
+            <select value={suffix} onChange={e => setSuffix(e.target.value as ModuleSuffix)} className="w-full appearance-none bg-gray-800 text-white pl-3 pr-9 py-2 rounded border border-gray-600 focus:outline-none focus:border-blue-500 text-sm cursor-pointer">
               {(['Web', 'App', 'CS', 'UI', 'IS', 'BL'] as ModuleSuffix[]).map(s => (
                 <option key={s} value={s}>_{s}</option>
               ))}
@@ -128,13 +128,13 @@ export default function ModuleForm({ module, onClose }: ModuleFormProps) {
           <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Owned Entities</label>
           <div className="flex gap-2 mb-2">
             <input value={entityInput} onChange={e => setEntityInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && addEntity()} placeholder="EntityName" className="flex-1 bg-gray-800 text-white px-3 py-2 rounded border border-gray-600 focus:outline-none focus:border-blue-500 text-sm" />
-            <button onClick={addEntity} className="bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm"><Plus size={14} /></button>
+            <button onClick={addEntity} className="bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm cursor-pointer"><Plus size={14} /></button>
           </div>
           <div className="flex flex-wrap gap-1.5">
             {entities.map(e => (
               <span key={e} className="flex items-center gap-1 bg-gray-700 text-white text-xs px-2 py-1 rounded">
                 {e}
-                <button onClick={() => setEntities(entities.filter(x => x !== e))} className="text-gray-400 hover:text-red-400"><X size={10} /></button>
+                <button onClick={() => setEntities(entities.filter(x => x !== e))} className="text-gray-400 hover:text-red-400 cursor-pointer"><X size={10} /></button>
               </span>
             ))}
           </div>
@@ -148,7 +148,7 @@ export default function ModuleForm({ module, onClose }: ModuleFormProps) {
         </div>
       </div>
       <div className="px-5 py-4 border-t border-gray-700 flex gap-3">
-        <button onClick={onClose} className="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-2 rounded text-sm transition-colors">Cancel</button>
+        <button onClick={onClose} className="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-2 rounded text-sm transition-colors cursor-pointer">Cancel</button>
         {/* E) Tooltip explains why Save is disabled */}
         <button
           onClick={handleSubmit}

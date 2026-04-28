@@ -293,7 +293,7 @@ export default function ArchitectureCanvas() {
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setDeleteConfirmId(null)}
-                className="px-3 py-1.5 text-sm bg-gray-700 text-white rounded hover:bg-gray-600 transition-colors"
+                className="px-3 py-1.5 text-sm bg-gray-700 text-white rounded hover:bg-gray-600 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -305,7 +305,7 @@ export default function ArchitectureCanvas() {
                   setShowForm(false);
                   setEditingModule(undefined);
                 }}
-                className="px-3 py-1.5 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                className="px-3 py-1.5 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition-colors cursor-pointer"
               >
                 Delete
               </button>

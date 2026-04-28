@@ -47,7 +47,7 @@ export default function ValidationPanel({ onClose, onHighlightModule }: Validati
             {infos.length > 0 && <span className="bg-blue-500 text-white text-xs px-1.5 py-0.5 rounded-full">{infos.length}</span>}
           </div>
         </div>
-        <button onClick={onClose} className="text-gray-400 hover:text-white"><X size={16} /></button>
+        <button onClick={onClose} className="text-gray-400 hover:text-white cursor-pointer"><X size={16} /></button>
       </div>
       <div className="flex-1 overflow-y-auto px-3 py-3 space-y-4">
         {violations.length === 0 && (

@@ -27,7 +27,7 @@ export default function KeyboardShortcutsHelp({ onClose }: Props) {
       >
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-white font-semibold text-lg">Keyboard Shortcuts</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">✕</button>
+          <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors cursor-pointer">✕</button>
         </div>
         <div className="space-y-2">
           {shortcuts.map(({ keys, description }) => (
