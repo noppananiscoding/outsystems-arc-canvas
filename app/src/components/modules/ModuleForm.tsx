@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Module, ModuleSuffix, ChecklistItem } from '@/types/architecture';
 import { deriveLayerAndTrack, validateModuleName } from '@/lib/module-utils';
 import { useArchitectureStore } from '@/store/architecture-store';
-import { X, Plus, Check } from 'lucide-react';
+import { X, Plus, Check, ChevronDown } from 'lucide-react';
 import ModuleChecklist from './ModuleChecklist';
 import { getDefaultChecklist } from '@/lib/checklist-utils';
 
@@ -107,11 +107,14 @@ export default function ModuleForm({ module, onClose }: ModuleFormProps) {
         </div>
         <div>
           <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Module Type</label>
-          <select value={suffix} onChange={e => setSuffix(e.target.value as ModuleSuffix)} className="w-full bg-gray-800 text-white px-3 py-2 rounded border border-gray-600 focus:outline-none focus:border-blue-500 text-sm">
-            {(['Web', 'App', 'CS', 'UI', 'IS', 'BL'] as ModuleSuffix[]).map(s => (
-              <option key={s} value={s}>_{s}</option>
-            ))}
-          </select>
+          <div className="relative">
+            <select value={suffix} onChange={e => setSuffix(e.target.value as ModuleSuffix)} className="w-full appearance-none bg-gray-800 text-white pl-3 pr-9 py-2 rounded border border-gray-600 focus:outline-none focus:border-blue-500 text-sm">
+              {(['Web', 'App', 'CS', 'UI', 'IS', 'BL'] as ModuleSuffix[]).map(s => (
+                <option key={s} value={s}>_{s}</option>
+              ))}
+            </select>
+            <ChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          </div>
         </div>
         <div className="bg-gray-800 rounded p-3 text-xs text-gray-400 space-y-1">
           <div className="flex justify-between"><span>Layer:</span><span className="text-white font-medium">{derivedInfo.layer}</span></div>
