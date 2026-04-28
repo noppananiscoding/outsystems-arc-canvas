@@ -1,0 +1,41 @@
+# Node / Next.js
+app/node_modules/
+app/.next/
+app/out/
+app/.pnp
+app/.pnp.*
+app/.yarn/*
+!app/.yarn/patches
+!app/.yarn/plugins
+!app/.yarn/releases
+!app/.yarn/versions
+
+# Build artifacts
+app/coverage/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+app/.env
+app/.env.local
+app/.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+/tmp/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# TypeScript
+*.tsbuildinfo
+app/next-env.d.ts
