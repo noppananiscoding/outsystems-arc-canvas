@@ -28,22 +28,35 @@ function parseAIError(err: unknown): string {
   const raw = err instanceof Error ? err.message : String(err);
 
   if (raw.includes('429') || raw.toLowerCase().includes('quota') || raw.toLowerCase().includes('rate')) {
-    // Try to extract retry delay
     const retryMatch = raw.match(/retryDelay["\s:]+(\d+)/);
-    const retrySeconds = retryMatch ? `~${retryMatch[1]}s` : 'a moment';
-    return `Rate limit reached. You've exceeded your free-tier quota. Please wait ${retrySeconds} and try again, or upgrade your API plan.`;
+    const retrySeconds = retryMatch ? parseInt(retryMatch[1]) : null;
+
+    // Daily quota exhausted — limit: 0 on day quota
+    if (raw.includes('PerDay') || raw.includes('per_day')) {
+      return '🚫 Daily quota exhausted. Your free-tier API project has no remaining requests for today.\n\nOptions:\n· Wait until midnight (Pacific Time) for quota reset\n· Create a new API key at aistudio.google.com\n· Enable billing on your Google Cloud project for higher limits';
+    }
+
+    // Per-minute rate limit with retry delay
+    if (retrySeconds !== null) {
+      return `⏱ Rate limited. Too many requests — please wait ${retrySeconds}s and try again.\n\nIf this keeps happening, switch to a model with a higher free-tier limit (e.g. gemini-1.5-flash-8b) or enable billing on your Google Cloud project.`;
+    }
+
+    return '⏱ Rate limit reached. You\'ve exceeded your free-tier quota.\n\nTry again in a moment, or enable billing on your Google Cloud project for higher limits.';
   }
-  if (raw.includes('401') || raw.toLowerCase().includes('api key') || raw.toLowerCase().includes('api_key') || raw.toLowerCase().includes('invalid key')) {
-    return 'Invalid API key. Please check your AI settings and re-enter your key.';
+  if (raw.includes('API_KEY_INVALID') || raw.includes('API Key not found') || raw.includes('401') || raw.toLowerCase().includes('invalid key')) {
+    return '🔑 Invalid API key. Please open AI Settings and re-enter a valid key.\n\nGet a free key at: aistudio.google.com/app/apikey';
   }
   if (raw.includes('403')) {
-    return 'Access denied. Your API key may not have permission for this model.';
+    return '🔒 Access denied. Your API key may not have permission for this model. Try a different model or check your Google Cloud project settings.';
+  }
+  if (raw.includes('404') || raw.toLowerCase().includes('not found for api version')) {
+    return '❌ Model not found. This model may not be available in your region or API version. Please select a different model in AI Settings.';
   }
   if (raw.includes('500') || raw.includes('503')) {
-    return 'The AI provider is temporarily unavailable. Please try again in a moment.';
+    return '⚠️ The AI provider is temporarily unavailable. Please try again in a moment.';
   }
   if (raw.toLowerCase().includes('fetch') || raw.toLowerCase().includes('network') || raw.toLowerCase().includes('enotfound')) {
-    return 'Network error. Please check your internet connection and try again.';
+    return '🌐 Network error. Please check your internet connection and try again.';
   }
   // Fallback — strip huge JSON blobs
   const truncated = raw.length > 200 ? raw.slice(0, 200) + '…' : raw;
