@@ -383,7 +383,7 @@ export default function GuidelinesPanel({ open, onClose }: GuidelinesPanelProps)
       />
 
       {/* Slide-over panel */}
-      <div className="fixed inset-y-0 right-0 w-[640px] bg-gray-900 border-l border-gray-700 shadow-2xl z-[120] flex flex-col">
+      <div className="fixed top-[44px] bottom-0 right-0 w-[640px] bg-gray-900 border-l border-gray-700 shadow-2xl z-[120] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-700 flex-shrink-0">
           <div className="flex items-center gap-2.5">

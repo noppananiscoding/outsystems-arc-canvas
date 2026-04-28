@@ -154,20 +154,15 @@ export default function AICopilotPanel({
   /* ── Collapsed state: slim bottom-right bar ── */
   if (size === 'collapsed') {
     return (
-      <div className="fixed bottom-4 right-4 z-40 flex items-center gap-2 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl px-4 py-2.5">
-        <Sparkles size={14} className="text-indigo-400" />
+      <div className="fixed bottom-4 right-4 z-40 flex items-center gap-2 bg-indigo-900 border border-indigo-600 rounded-xl shadow-2xl px-4 py-2.5 cursor-pointer" onClick={() => setSize('normal')}>
+        <Sparkles size={14} className="text-indigo-300" />
         <span className="text-white text-sm font-semibold">AI Copilot</span>
         {messages.length > 0 && (
-          <span className="text-[10px] bg-indigo-900/60 border border-indigo-700/50 text-indigo-300 px-1.5 py-0.5 rounded font-mono">
-            {messages.length} msg{messages.length !== 1 ? 's' : ''}
+          <span className="text-[10px] bg-indigo-700 border border-indigo-500 text-indigo-200 px-1.5 py-0.5 rounded-full font-mono">
+            {messages.length}
           </span>
         )}
-        <button onClick={() => setSize('normal')} title="Expand" className="text-gray-400 hover:text-white transition-colors cursor-pointer ml-1">
-          <ChevronUp size={15} />
-        </button>
-        <button onClick={onClose} title="Close" className="text-gray-400 hover:text-white transition-colors cursor-pointer">
-          <X size={14} />
-        </button>
+        <ChevronUp size={15} className="text-indigo-300 ml-1" />
       </div>
     );
   }
@@ -175,7 +170,7 @@ export default function AICopilotPanel({
   /* ── Normal / Expanded state ── */
   return (
     <div
-      className={`fixed top-0 right-0 h-full ${panelWidth} bg-gray-900 border-l border-gray-700 flex flex-col z-40 shadow-2xl overflow-hidden transition-[width] duration-200`}
+      className={`fixed top-[44px] right-0 h-[calc(100vh-44px)] ${panelWidth} bg-gray-900 border-l border-gray-700 flex flex-col z-40 shadow-2xl overflow-hidden transition-[width] duration-200`}
       style={{ maxWidth: '100vw' }}
     >
       {/* Header */}
@@ -188,29 +183,29 @@ export default function AICopilotPanel({
           </span>
         </div>
         <div className="flex items-center gap-1">
-          {/* Expand / Normal toggle */}
+          {/* Expand / Shrink */}
           <button
             onClick={() => setSize(s => s === 'expanded' ? 'normal' : 'expanded')}
             title={size === 'expanded' ? 'Shrink panel' : 'Expand panel'}
-            className="text-gray-400 hover:text-white transition-colors cursor-pointer p-1 rounded hover:bg-gray-700"
+            className="flex items-center justify-center w-6 h-6 text-gray-300 hover:text-white hover:bg-gray-700 rounded transition-colors cursor-pointer"
           >
-            {size === 'expanded' ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
+            {size === 'expanded' ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
           </button>
-          {/* Collapse to bar */}
+          {/* Minimise to pill */}
           <button
             onClick={() => setSize('collapsed')}
             title="Minimise"
-            className="text-gray-400 hover:text-white transition-colors cursor-pointer p-1 rounded hover:bg-gray-700"
+            className="flex items-center justify-center w-6 h-6 text-gray-300 hover:text-white hover:bg-gray-700 rounded transition-colors cursor-pointer"
           >
-            <ChevronDown size={14} />
+            <ChevronDown size={16} />
           </button>
           {/* Close */}
           <button
             onClick={onClose}
             title="Close"
-            className="text-gray-400 hover:text-white transition-colors cursor-pointer p-1 rounded hover:bg-gray-700"
+            className="flex items-center justify-center w-6 h-6 text-gray-300 hover:text-white hover:bg-red-700/60 rounded transition-colors cursor-pointer"
           >
-            <X size={14} />
+            <X size={15} />
           </button>
         </div>
       </div>

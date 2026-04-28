@@ -148,7 +148,7 @@ export default function AIReviewPanel({
 
   return (
     <div
-      className="fixed top-0 right-0 h-full w-[640px] bg-gray-900 border-l border-gray-700 flex flex-col z-50 shadow-2xl"
+      className="fixed top-[44px] right-0 h-[calc(100vh-44px)] w-[640px] bg-gray-900 border-l border-gray-700 flex flex-col z-50 shadow-2xl"
       style={{ maxWidth: '100vw' }}
     >
       {/* ── Header ─────────────────────────────────────────────────────────── */}

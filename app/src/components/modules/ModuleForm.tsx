@@ -60,7 +60,7 @@ export default function ModuleForm({ module, onClose }: ModuleFormProps) {
   };
 
   return (
-    <div className="fixed inset-y-0 right-0 w-[480px] bg-gray-900 border-l border-gray-700 shadow-2xl z-[100] flex flex-col">
+    <div className="fixed top-[44px] bottom-0 right-0 w-[480px] bg-gray-900 border-l border-gray-700 shadow-2xl z-[100] flex flex-col">
       <div className="flex items-center justify-between px-5 py-4 border-b border-gray-700">
         <h2 className="text-white font-semibold text-lg">{module ? 'Edit Module' : 'Add Module'}</h2>
         <button onClick={onClose} className="text-gray-400 hover:text-white cursor-pointer"><X size={20} /></button>
