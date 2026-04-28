@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { streamAIChat, AIProvider } from '@/lib/ai-client';
+import { streamAIChat, AIProvider, GENERATE_MAX_OUTPUT_TOKENS } from '@/lib/ai-client';
 import { buildGeneratePrompt } from '@/lib/ai-generate-prompt';
 import { parseAndValidateAIOutput, ParsedArchitecture } from '@/lib/ai-output-parser';
 
@@ -24,7 +24,7 @@ async function collectStream(
 ): Promise<string> {
   const messages = [{ role: 'user' as const, content: prompt }];
   let result = '';
-  for await (const chunk of streamAIChat(provider, apiKey, model, '', messages)) {
+  for await (const chunk of streamAIChat(provider, apiKey, model, '', messages, GENERATE_MAX_OUTPUT_TOKENS)) {
     result += chunk;
   }
   return result;
@@ -57,7 +57,6 @@ export async function POST(req: NextRequest) {
     try {
       parsed = JSON.parse(jsonStr);
     } catch {
-      // Retry
       const retryPrompt = `${prompt}\n\nIMPORTANT: Return ONLY valid JSON, no markdown fences, no explanation.`;
       const retryText = await collectStream(provider as AIProvider, apiKey, model, retryPrompt);
       const retryJson = extractJSON(retryText);

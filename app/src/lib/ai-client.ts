@@ -5,27 +5,31 @@ export interface AIMessage {
   content: string;
 }
 
-/** Max tokens returned per response — keeps costs low and responses focused */
-const MAX_OUTPUT_TOKENS = 1024;
+/** Default max tokens for chat/review responses — keeps costs low */
+const DEFAULT_MAX_OUTPUT_TOKENS = 1024;
+/** Higher limit for generate — full JSON architecture needs more room */
+export const GENERATE_MAX_OUTPUT_TOKENS = 3000;
 
 /**
  * Streams AI chat responses, yielding text chunks as they arrive.
  * All calls happen server-side (via Next.js API route) so no browser
  * restrictions apply.
+ * @param maxTokens Override the default output token limit.
  */
 export async function* streamAIChat(
   provider: AIProvider,
   apiKey: string,
   model: string,
   systemPrompt: string,
-  messages: AIMessage[]
+  messages: AIMessage[],
+  maxTokens: number = DEFAULT_MAX_OUTPUT_TOKENS
 ): AsyncGenerator<string> {
   if (provider === 'gemini') {
-    yield* streamGemini(apiKey, model, systemPrompt, messages);
+    yield* streamGemini(apiKey, model, systemPrompt, messages, maxTokens);
   } else if (provider === 'openai') {
-    yield* streamOpenAI(apiKey, model, systemPrompt, messages);
+    yield* streamOpenAI(apiKey, model, systemPrompt, messages, maxTokens);
   } else {
-    yield* streamAnthropic(apiKey, model, systemPrompt, messages);
+    yield* streamAnthropic(apiKey, model, systemPrompt, messages, maxTokens);
   }
 }
 
@@ -33,14 +37,15 @@ async function* streamGemini(
   apiKey: string,
   model: string,
   systemPrompt: string,
-  messages: AIMessage[]
+  messages: AIMessage[],
+  maxTokens: number
 ): AsyncGenerator<string> {
   const { GoogleGenerativeAI } = await import('@google/generative-ai');
   const genAI = new GoogleGenerativeAI(apiKey);
   const geminiModel = genAI.getGenerativeModel({
     model,
     systemInstruction: systemPrompt,
-    generationConfig: { maxOutputTokens: MAX_OUTPUT_TOKENS },
+    generationConfig: { maxOutputTokens: maxTokens },
   });
 
   // Gemini history excludes the last user message (sent separately)
@@ -62,7 +67,8 @@ async function* streamOpenAI(
   apiKey: string,
   model: string,
   systemPrompt: string,
-  messages: AIMessage[]
+  messages: AIMessage[],
+  maxTokens: number
 ): AsyncGenerator<string> {
   const OpenAI = (await import('openai')).default;
   const client = new OpenAI({ apiKey });
@@ -70,7 +76,7 @@ async function* streamOpenAI(
   const stream = await client.chat.completions.create({
     model,
     stream: true,
-    max_tokens: MAX_OUTPUT_TOKENS,
+    max_tokens: maxTokens,
     messages: [
       { role: 'system', content: systemPrompt },
       ...messages.map(m => ({ role: m.role, content: m.content })),
@@ -86,14 +92,15 @@ async function* streamAnthropic(
   apiKey: string,
   model: string,
   systemPrompt: string,
-  messages: AIMessage[]
+  messages: AIMessage[],
+  maxTokens: number
 ): AsyncGenerator<string> {
   const Anthropic = (await import('@anthropic-ai/sdk')).default;
   const client = new Anthropic({ apiKey });
 
   const stream = client.messages.stream({
     model,
-    max_tokens: MAX_OUTPUT_TOKENS,
+    max_tokens: maxTokens,
     system: systemPrompt,
     messages: messages.map(m => ({ role: m.role, content: m.content })),
   });
