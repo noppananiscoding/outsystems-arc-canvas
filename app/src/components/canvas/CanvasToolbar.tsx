@@ -4,7 +4,7 @@ import { useArchitectureStore } from '@/store/architecture-store';
 import { importFromJSON } from '@/lib/import-export';
 import { BEST_PRACTICES_ARCHITECTURE, ANTI_PATTERN_SHOWCASE } from '@/lib/sample-architectures';
 import { toast } from 'sonner';
-import { Download, Upload, Plus, CheckSquare, BookOpen, ChevronDown, Keyboard } from 'lucide-react';
+import { Download, Upload, Plus, CheckSquare, BookOpen, ChevronDown, Keyboard, Layers, ShieldCheck, AlertCircle } from 'lucide-react';
 
 interface CanvasToolbarProps {
   onAddModule: () => void;
@@ -12,6 +12,7 @@ interface CanvasToolbarProps {
   showValidation: boolean;
   onExport: () => void;
   onToggleShortcuts: () => void;
+  onOpenGuidelines: () => void;
 }
 
 export default function CanvasToolbar({
@@ -20,6 +21,7 @@ export default function CanvasToolbar({
   showValidation,
   onExport,
   onToggleShortcuts,
+  onOpenGuidelines,
 }: CanvasToolbarProps) {
   const { projectName, violations, setProjectName, importArchitecture, validateAll } = useArchitectureStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -85,7 +87,7 @@ export default function CanvasToolbar({
           onClick={() => setShowSampleMenu(v => !v)}
           className="flex items-center gap-1.5 bg-gray-700 hover:bg-gray-600 text-white text-sm px-3 py-1.5 rounded transition-colors"
         >
-          <BookOpen size={14} /> Samples <ChevronDown size={12} />
+          <Layers size={14} /> Samples <ChevronDown size={12} />
         </button>
         {showSampleMenu && (
           <div className="absolute top-full left-0 mt-1 w-72 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50 overflow-hidden">
@@ -103,7 +105,7 @@ export default function CanvasToolbar({
               className="w-full text-left px-4 py-3 hover:bg-gray-700 transition-colors border-b border-gray-700/50"
             >
               <div className="flex items-center gap-2 mb-0.5">
-                <span className="text-green-400 text-sm">✅</span>
+                <ShieldCheck size={14} className="text-emerald-400 flex-shrink-0" />
                 <span className="text-white text-sm font-medium">Best Practices Reference</span>
               </div>
               <p className="text-gray-400 text-xs ml-6">12 modules · All valid · Zero violations · Full reference architecture</p>
@@ -118,7 +120,7 @@ export default function CanvasToolbar({
               className="w-full text-left px-4 py-3 hover:bg-gray-700 transition-colors"
             >
               <div className="flex items-center gap-2 mb-0.5">
-                <span className="text-red-400 text-sm">❌</span>
+                <AlertCircle size={14} className="text-red-400 flex-shrink-0" />
                 <span className="text-white text-sm font-medium">Anti-Pattern Showcase</span>
               </div>
               <p className="text-gray-400 text-xs ml-6">22 modules · Intentional violations · All 8 anti-patterns visible</p>
@@ -138,6 +140,14 @@ export default function CanvasToolbar({
             {warnCount > 0 && <span className="bg-amber-500 text-white text-xs px-1.5 py-0.5 rounded-full">{warnCount}</span>}
           </span>
         )}
+      </button>
+
+      <button
+        onClick={onOpenGuidelines}
+        title="Architecture Guidelines (G)"
+        className="flex items-center gap-1.5 bg-gray-700 hover:bg-gray-600 text-white text-sm px-3 py-1.5 rounded transition-colors"
+      >
+        <BookOpen size={14} /> Guidelines
       </button>
 
       {/* Spacer pushes ? button to far right */}

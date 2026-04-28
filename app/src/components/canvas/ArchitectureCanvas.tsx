@@ -18,6 +18,7 @@ import CanvasToolbar from './CanvasToolbar';
 import ModuleForm from '../modules/ModuleForm';
 import ValidationPanel from '../validation/ValidationPanel';
 import KeyboardShortcutsHelp from './KeyboardShortcutsHelp';
+import GuidelinesPanel from '../guidelines/GuidelinesPanel';
 
 const nodeTypes: NodeTypes = { moduleNode: ModuleNode };
 const edgeTypes: EdgeTypes = { dependencyEdge: DependencyEdge };
@@ -33,6 +34,7 @@ export default function ArchitectureCanvas() {
   const [showForm, setShowForm] = useState(false);
   const [showValidation, setShowValidation] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
+  const [showGuidelines, setShowGuidelines] = useState(false);
   const [editingModule, setEditingModule] = useState<Module | undefined>(undefined);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   // Tracks the currently-selected edge ID so Del/Backspace can delete it
@@ -76,6 +78,7 @@ export default function ArchitectureCanvas() {
         setShowForm(false);
         setShowValidation(false);
         setShowShortcuts(false);
+        setShowGuidelines(false);
         setDeleteConfirmId(null);
         return;
       }
@@ -87,6 +90,13 @@ export default function ArchitectureCanvas() {
       }
 
       if (isTyping) return; // block all other shortcuts when typing
+
+      // G — toggle guidelines
+      if (e.key === 'g' || e.key === 'G') {
+        e.preventDefault();
+        setShowGuidelines(v => !v);
+        return;
+      }
 
       // N — new module
       if (e.key === 'n' || e.key === 'N') {
@@ -230,6 +240,7 @@ export default function ArchitectureCanvas() {
         showValidation={showValidation}
         onExport={handleExport}
         onToggleShortcuts={() => setShowShortcuts(v => !v)}
+        onOpenGuidelines={() => setShowGuidelines(true)}
       />
 
       <div className="flex flex-1 overflow-hidden relative">
@@ -307,6 +318,9 @@ export default function ArchitectureCanvas() {
       {showShortcuts && (
         <KeyboardShortcutsHelp onClose={() => setShowShortcuts(false)} />
       )}
+
+      {/* Architecture Guidelines slide-over */}
+      <GuidelinesPanel open={showGuidelines} onClose={() => setShowGuidelines(false)} />
     </div>
   );
 }

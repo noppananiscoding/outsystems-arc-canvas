@@ -1,7 +1,7 @@
 'use client';
 import { useArchitectureStore } from '@/store/architecture-store';
 import { ValidationViolation } from '@/types/architecture';
-import { X, AlertCircle, AlertTriangle, Info } from 'lucide-react';
+import { X, AlertCircle, AlertTriangle, Info, ShieldCheck } from 'lucide-react';
 
 interface ValidationPanelProps {
   onClose: () => void;
@@ -52,8 +52,9 @@ export default function ValidationPanel({ onClose, onHighlightModule }: Validati
       <div className="flex-1 overflow-y-auto px-3 py-3 space-y-4">
         {violations.length === 0 && (
           <div className="text-center py-8 text-gray-500">
-            <p className="text-2xl mb-2">✅</p>
-            <p className="text-sm">No violations found</p>
+            <ShieldCheck size={48} className="text-emerald-400 mx-auto mb-3" />
+            <p className="text-sm font-medium text-emerald-400">Architecture is valid</p>
+            <p className="text-xs text-gray-500 mt-1">No violations found</p>
           </div>
         )}
         {errors.length > 0 && (

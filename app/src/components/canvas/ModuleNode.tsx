@@ -52,7 +52,7 @@ function ModuleNode({ data, selected }: NodeProps<ModuleNodeData>) {
           {data.dependsOn.length > 0 && (
             <span className="bg-gray-700 px-1.5 py-0.5 rounded">{data.dependsOn.length} deps</span>
           )}
-          <span>{validationIcon}</span>
+          <span>{ValidationIcon}</span>
         </div>
       </div>
       <Handle type="source" position={Position.Bottom} className="!bg-gray-400 !w-3 !h-3" />

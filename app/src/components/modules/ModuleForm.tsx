@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Module, ModuleSuffix, ChecklistItem } from '@/types/architecture';
 import { deriveLayerAndTrack, validateModuleName } from '@/lib/module-utils';
 import { useArchitectureStore } from '@/store/architecture-store';
-import { X, Plus } from 'lucide-react';
+import { X, Plus, Check } from 'lucide-react';
 import ModuleChecklist from './ModuleChecklist';
 import { getDefaultChecklist } from '@/lib/checklist-utils';
 
@@ -95,7 +95,12 @@ export default function ModuleForm({ module, onClose }: ModuleFormProps) {
               <code className="text-gray-400">Portal_Web</code>
             </p>
           ) : nameValidation.valid ? (
-            <p className="text-green-400 text-xs mt-1">✓ Valid module name</p>
+            <p className="flex items-center gap-1 text-emerald-400 text-xs mt-1">
+              <span className="inline-flex items-center justify-center h-3.5 w-3.5 rounded-full bg-emerald-500/10 text-emerald-400">
+                <Check size={9} strokeWidth={3} />
+              </span>
+              Valid module name
+            </p>
           ) : (
             <p className="text-red-400 text-xs mt-1">✗ {nameValidation.error}</p>
           )}

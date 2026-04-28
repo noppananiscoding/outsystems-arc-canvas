@@ -8,6 +8,7 @@ const shortcuts = [
   { keys: ['N'], description: 'New module' },
   { keys: ['E'], description: 'Edit selected module' },
   { keys: ['Del'], description: 'Delete selected module' },
+  { keys: ['G'], description: 'Open Architecture Guidelines' },
   { keys: ['Esc'], description: 'Close panel' },
   { keys: ['Ctrl', 'S'], description: 'Export architecture' },
   { keys: ['Ctrl', '⇧', 'V'], description: 'Validate architecture' },
