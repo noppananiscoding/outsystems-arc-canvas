@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { streamAIChat, AIProvider, GENERATE_MAX_OUTPUT_TOKENS } from '@/lib/ai-client';
+import { streamAIChat, AIProvider } from '@/lib/ai-client';
 import { buildGeneratePrompt } from '@/lib/ai-generate-prompt';
 import { parseAndValidateAIOutput, ParsedArchitecture } from '@/lib/ai-output-parser';
 
@@ -24,7 +24,8 @@ async function collectStream(
 ): Promise<string> {
   const messages = [{ role: 'user' as const, content: prompt }];
   let result = '';
-  for await (const chunk of streamAIChat(provider, apiKey, model, '', messages, GENERATE_MAX_OUTPUT_TOKENS)) {
+  // No token cap for generate — full JSON architecture can be large
+  for await (const chunk of streamAIChat(provider, apiKey, model, '', messages, undefined)) {
     result += chunk;
   }
   return result;
@@ -63,7 +64,12 @@ export async function POST(req: NextRequest) {
       try {
         parsed = JSON.parse(retryJson);
       } catch {
-        return Response.json({ error: 'Failed to parse AI response as JSON after retry.' }, { status: 500 });
+        // Include a snippet of the raw response to help diagnose the issue
+        const snippet = retryText.slice(0, 300).replace(/\n/g, ' ');
+        return Response.json(
+          { error: `AI returned an invalid response that could not be parsed as JSON. Raw response preview: "${snippet}…"` },
+          { status: 500 }
+        );
       }
     }
 
