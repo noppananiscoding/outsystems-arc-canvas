@@ -8,6 +8,7 @@ export interface ChatMessageData {
   content: string;
   streaming?: boolean;
   provider?: string;
+  isError?: boolean;
 }
 
 interface ChatMessageProps {
@@ -79,8 +80,8 @@ export default function ChatMessage({ message }: ChatMessageProps) {
 
   if (isUser) {
     return (
-      <div className="flex justify-end mb-3">
-        <div className="max-w-[85%] bg-indigo-600 text-white text-sm px-3.5 py-2.5 rounded-2xl rounded-tr-sm shadow-sm">
+      <div className="flex justify-end mt-2">
+        <div className="max-w-[85%] bg-indigo-600 text-white text-sm px-3.5 py-2.5 rounded-2xl rounded-tr-sm shadow-sm break-words min-w-0" style={{ overflowWrap: 'anywhere' }}>
           {message.content}
         </div>
       </div>
@@ -89,9 +90,16 @@ export default function ChatMessage({ message }: ChatMessageProps) {
 
   // Assistant message
   return (
-    <div className="flex justify-start mb-3">
-      <div className="max-w-[92%]">
-        <div className="bg-gray-800 border border-gray-700/50 text-gray-100 text-sm px-3.5 py-2.5 rounded-2xl rounded-tl-sm shadow-sm leading-relaxed">
+    <div className="flex justify-start mt-2">
+      <div className="max-w-[92%] min-w-0">
+        <div
+          className={`text-sm px-3.5 py-2.5 rounded-2xl rounded-tl-sm shadow-sm leading-relaxed min-w-0 ${
+            message.isError
+              ? 'bg-red-950/60 border border-red-700/50 text-red-200'
+              : 'bg-gray-800 border border-gray-700/50 text-gray-100'
+          }`}
+          style={{ overflowWrap: 'anywhere' }}
+        >
           {message.streaming && message.content === '' ? (
             // Three-dot loading pulse
             <span className="flex gap-1 items-center py-1">
@@ -100,7 +108,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
               <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce [animation-delay:300ms]" />
             </span>
           ) : (
-            <div>{renderMarkdown(message.content)}</div>
+            <div style={{ overflowWrap: 'anywhere' }}>{renderMarkdown(message.content)}</div>
           )}
         </div>
 

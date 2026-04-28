@@ -20,6 +20,8 @@ import ValidationPanel from '../validation/ValidationPanel';
 import KeyboardShortcutsHelp from './KeyboardShortcutsHelp';
 import GuidelinesPanel from '../guidelines/GuidelinesPanel';
 import AICopilotPanel from '../ai/AICopilotPanel';
+import AIReviewPanel from '../ai/AIReviewPanel';
+import AIGenerateDialog from '../ai/AIGenerateDialog';
 
 const nodeTypes: NodeTypes = { moduleNode: ModuleNode };
 const edgeTypes: EdgeTypes = { dependencyEdge: DependencyEdge };
@@ -29,7 +31,7 @@ export default function ArchitectureCanvas() {
     modules, dependencies, selectedModuleId,
     addDependency, deleteDependency, loadSampleData, isInitialized,
     validateAll, updateModule, selectModule, deleteModule,
-    projectName, violations, aiMode,
+    projectName, violations, aiMode, aiProvider, aiApiKey, aiModel,
   } = useArchitectureStore();
 
   const [showForm, setShowForm] = useState(false);
@@ -37,6 +39,8 @@ export default function ArchitectureCanvas() {
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [showGuidelines, setShowGuidelines] = useState(false);
   const [showAIPanel, setShowAIPanel] = useState(false);
+  const [showReviewPanel, setShowReviewPanel] = useState(false);
+  const [showGenerateDialog, setShowGenerateDialog] = useState(false);
   const [editingModule, setEditingModule] = useState<Module | undefined>(undefined);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   // Tracks the currently-selected edge ID so Del/Backspace can delete it
@@ -253,6 +257,8 @@ export default function ArchitectureCanvas() {
         onToggleShortcuts={() => setShowShortcuts(v => !v)}
         onOpenGuidelines={() => setShowGuidelines(true)}
         onOpenAI={() => setShowAIPanel(true)}
+        onOpenReview={() => setShowReviewPanel(true)}
+        onOpenGenerate={() => setShowGenerateDialog(true)}
       />
 
       <div className="flex flex-1 overflow-hidden relative">
@@ -341,6 +347,27 @@ export default function ArchitectureCanvas() {
         modules={modules}
         violations={violations}
         projectName={projectName}
+      />
+
+      {/* AI Review Panel */}
+      <AIReviewPanel
+        open={showReviewPanel && aiMode}
+        onClose={() => setShowReviewPanel(false)}
+        modules={modules}
+        violations={violations}
+        projectName={projectName}
+        provider={aiProvider}
+        apiKey={aiApiKey}
+        model={aiModel}
+      />
+
+      {/* AI Generate Dialog */}
+      <AIGenerateDialog
+        open={showGenerateDialog && aiMode}
+        onClose={() => setShowGenerateDialog(false)}
+        provider={aiProvider}
+        apiKey={aiApiKey}
+        model={aiModel}
       />
     </div>
   );

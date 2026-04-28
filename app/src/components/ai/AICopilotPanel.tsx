@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Sparkles, X, Send } from 'lucide-react';
+import { Sparkles, X, Send, ChevronDown, ChevronUp, Maximize2, Minimize2 } from 'lucide-react';
 import { useArchitectureStore } from '@/store/architecture-store';
 import { serializeCanvasContext } from '@/lib/ai-context';
 import { Module, ValidationViolation } from '@/types/architecture';
@@ -23,6 +23,35 @@ const QUICK_PROMPTS = [
   'Best practices check',
 ];
 
+/** Convert raw API/SDK error messages into short human-readable strings */
+function parseAIError(err: unknown): string {
+  const raw = err instanceof Error ? err.message : String(err);
+
+  if (raw.includes('429') || raw.toLowerCase().includes('quota') || raw.toLowerCase().includes('rate')) {
+    // Try to extract retry delay
+    const retryMatch = raw.match(/retryDelay["\s:]+(\d+)/);
+    const retrySeconds = retryMatch ? `~${retryMatch[1]}s` : 'a moment';
+    return `Rate limit reached. You've exceeded your free-tier quota. Please wait ${retrySeconds} and try again, or upgrade your API plan.`;
+  }
+  if (raw.includes('401') || raw.toLowerCase().includes('api key') || raw.toLowerCase().includes('api_key') || raw.toLowerCase().includes('invalid key')) {
+    return 'Invalid API key. Please check your AI settings and re-enter your key.';
+  }
+  if (raw.includes('403')) {
+    return 'Access denied. Your API key may not have permission for this model.';
+  }
+  if (raw.includes('500') || raw.includes('503')) {
+    return 'The AI provider is temporarily unavailable. Please try again in a moment.';
+  }
+  if (raw.toLowerCase().includes('fetch') || raw.toLowerCase().includes('network') || raw.toLowerCase().includes('enotfound')) {
+    return 'Network error. Please check your internet connection and try again.';
+  }
+  // Fallback — strip huge JSON blobs
+  const truncated = raw.length > 200 ? raw.slice(0, 200) + '…' : raw;
+  return truncated;
+}
+
+type PanelSize = 'normal' | 'expanded' | 'collapsed';
+
 export default function AICopilotPanel({
   open,
   onClose,
@@ -35,16 +64,17 @@ export default function AICopilotPanel({
   const [messages, setMessages] = useState<ChatMessageData[]>([]);
   const [input, setInput] = useState('');
   const [streaming, setStreaming] = useState(false);
+  const [size, setSize] = useState<PanelSize>('normal');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
 
-  // Auto-scroll to bottom when messages change
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    if (size !== 'collapsed') {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, size]);
 
-  // Auto-resize textarea
   useEffect(() => {
     const ta = textareaRef.current;
     if (!ta) return;
@@ -59,30 +89,17 @@ export default function AICopilotPanel({
 
       const canvasContext = serializeCanvasContext(modules, violations, projectName);
 
-      // Add user message
-      const userMsg: ChatMessageData = {
-        id: uuidv4(),
-        role: 'user',
-        content: trimmed,
-      };
-
-      // Add streaming placeholder for assistant
+      const userMsg: ChatMessageData = { id: uuidv4(), role: 'user', content: trimmed };
       const assistantId = uuidv4();
       const assistantPlaceholder: ChatMessageData = {
-        id: assistantId,
-        role: 'assistant',
-        content: '',
-        streaming: true,
-        provider: aiProvider,
+        id: assistantId, role: 'assistant', content: '', streaming: true, provider: aiProvider,
       };
 
       setMessages(prev => [...prev, userMsg, assistantPlaceholder]);
       setInput('');
       setStreaming(true);
 
-      // Build history (exclude the latest streaming placeholder)
       const history = messages.map(m => ({ role: m.role, content: m.content }));
-
       const controller = new AbortController();
       abortRef.current = controller;
 
@@ -91,14 +108,7 @@ export default function AICopilotPanel({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           signal: controller.signal,
-          body: JSON.stringify({
-            message: trimmed,
-            history,
-            canvasContext,
-            provider: aiProvider,
-            apiKey: aiApiKey,
-            model: aiModel,
-          }),
+          body: JSON.stringify({ message: trimmed, history, canvasContext, provider: aiProvider, apiKey: aiApiKey, model: aiModel }),
         });
 
         if (!res.ok || !res.body) {
@@ -113,45 +123,17 @@ export default function AICopilotPanel({
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-          const chunk = decoder.decode(value, { stream: true });
-          accumulated += chunk;
-
-          setMessages(prev =>
-            prev.map(m =>
-              m.id === assistantId
-                ? { ...m, content: accumulated, streaming: true }
-                : m
-            )
-          );
+          accumulated += decoder.decode(value, { stream: true });
+          setMessages(prev => prev.map(m => m.id === assistantId ? { ...m, content: accumulated, streaming: true } : m));
         }
 
-        // Finalise — remove streaming flag
-        setMessages(prev =>
-          prev.map(m =>
-            m.id === assistantId
-              ? { ...m, content: accumulated, streaming: false }
-              : m
-          )
-        );
+        setMessages(prev => prev.map(m => m.id === assistantId ? { ...m, content: accumulated, streaming: false } : m));
       } catch (err) {
         if ((err as { name?: string }).name === 'AbortError') {
-          // User cancelled
-          setMessages(prev =>
-            prev.map(m =>
-              m.id === assistantId
-                ? { ...m, content: m.content + '\n\n[Cancelled]', streaming: false }
-                : m
-            )
-          );
+          setMessages(prev => prev.map(m => m.id === assistantId ? { ...m, content: (m.content || '') + '\n\n*Cancelled.*', streaming: false } : m));
         } else {
-          const errMsg = err instanceof Error ? err.message : 'Unknown error';
-          setMessages(prev =>
-            prev.map(m =>
-              m.id === assistantId
-                ? { ...m, content: `[Error: ${errMsg}]`, streaming: false }
-                : m
-            )
-          );
+          const friendly = parseAIError(err);
+          setMessages(prev => prev.map(m => m.id === assistantId ? { ...m, content: friendly, streaming: false, isError: true } : m));
         }
       } finally {
         setStreaming(false);
@@ -162,17 +144,38 @@ export default function AICopilotPanel({
   );
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage(input);
-    }
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(input); }
   };
 
   if (!open) return null;
 
+  const panelWidth = size === 'expanded' ? 'w-[680px]' : 'w-[480px]';
+
+  /* ── Collapsed state: slim bottom-right bar ── */
+  if (size === 'collapsed') {
+    return (
+      <div className="fixed bottom-4 right-4 z-40 flex items-center gap-2 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl px-4 py-2.5">
+        <Sparkles size={14} className="text-indigo-400" />
+        <span className="text-white text-sm font-semibold">AI Copilot</span>
+        {messages.length > 0 && (
+          <span className="text-[10px] bg-indigo-900/60 border border-indigo-700/50 text-indigo-300 px-1.5 py-0.5 rounded font-mono">
+            {messages.length} msg{messages.length !== 1 ? 's' : ''}
+          </span>
+        )}
+        <button onClick={() => setSize('normal')} title="Expand" className="text-gray-400 hover:text-white transition-colors cursor-pointer ml-1">
+          <ChevronUp size={15} />
+        </button>
+        <button onClick={onClose} title="Close" className="text-gray-400 hover:text-white transition-colors cursor-pointer">
+          <X size={14} />
+        </button>
+      </div>
+    );
+  }
+
+  /* ── Normal / Expanded state ── */
   return (
     <div
-      className="fixed top-0 right-0 h-full w-[480px] bg-gray-900 border-l border-gray-700 flex flex-col z-40 shadow-2xl"
+      className={`fixed top-0 right-0 h-full ${panelWidth} bg-gray-900 border-l border-gray-700 flex flex-col z-40 shadow-2xl overflow-hidden transition-[width] duration-200`}
       style={{ maxWidth: '100vw' }}
     >
       {/* Header */}
@@ -184,13 +187,36 @@ export default function AICopilotPanel({
             {aiProvider}
           </span>
         </div>
-        <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors cursor-pointer">
-          <X size={16} />
-        </button>
+        <div className="flex items-center gap-1">
+          {/* Expand / Normal toggle */}
+          <button
+            onClick={() => setSize(s => s === 'expanded' ? 'normal' : 'expanded')}
+            title={size === 'expanded' ? 'Shrink panel' : 'Expand panel'}
+            className="text-gray-400 hover:text-white transition-colors cursor-pointer p-1 rounded hover:bg-gray-700"
+          >
+            {size === 'expanded' ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
+          </button>
+          {/* Collapse to bar */}
+          <button
+            onClick={() => setSize('collapsed')}
+            title="Minimise"
+            className="text-gray-400 hover:text-white transition-colors cursor-pointer p-1 rounded hover:bg-gray-700"
+          >
+            <ChevronDown size={14} />
+          </button>
+          {/* Close */}
+          <button
+            onClick={onClose}
+            title="Close"
+            className="text-gray-400 hover:text-white transition-colors cursor-pointer p-1 rounded hover:bg-gray-700"
+          >
+            <X size={14} />
+          </button>
+        </div>
       </div>
 
       {/* Messages area */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-1">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 py-3 min-w-0 scrollbar-thin">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center gap-3 py-12">
             <div className="w-12 h-12 rounded-full bg-indigo-900/40 border border-indigo-700/50 flex items-center justify-center">
@@ -204,15 +230,12 @@ export default function AICopilotPanel({
         ) : (
           messages.map(msg => <ChatMessage key={msg.id} message={msg} />)
         )}
-        {streaming && messages[messages.length - 1]?.streaming && messages[messages.length - 1]?.content === '' && (
-          <div className="text-gray-500 text-xs italic px-1">Analyzing your architecture…</div>
-        )}
         <div ref={messagesEndRef} />
       </div>
 
       {/* Quick prompt chips */}
       <div className="px-4 py-2 border-t border-gray-800 flex-shrink-0">
-        <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+        <div className="flex flex-wrap gap-1.5">
           {QUICK_PROMPTS.map(prompt => (
             <button
               key={prompt}
@@ -246,15 +269,14 @@ export default function AICopilotPanel({
             onClick={() => sendMessage(input)}
             disabled={!input.trim() || streaming}
             className="flex-shrink-0 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-white p-2.5 rounded-xl transition-colors cursor-pointer"
-            title="Send message"
+            title="Send (Enter)"
           >
             <Send size={14} />
           </button>
         </div>
-        <p className="text-[10px] text-gray-600 mt-1.5">
-          Enter to send · Shift+Enter for newline
-        </p>
+        <p className="text-[10px] text-gray-600 mt-1.5">Enter to send · Shift+Enter for newline</p>
       </div>
     </div>
   );
 }
+
