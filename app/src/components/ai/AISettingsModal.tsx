@@ -16,10 +16,15 @@ const PROVIDERS: { value: AIProvider; label: string; keyPage: string }[] = [
   { value: 'anthropic', label: 'Anthropic (Claude)', keyPage: 'https://console.anthropic.com/settings/api-keys' },
 ];
 
-const MODELS: Record<AIProvider, { value: string; label: string }[]> = {
+const MODELS: Record<AIProvider, { value: string; label: string; tier?: string }[]> = {
   gemini: [
-    { value: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash (Recommended)' },
-    { value: 'gemini-1.5-pro', label: 'Gemini 1.5 Pro' },
+    { value: 'gemini-2.0-flash',           label: 'Gemini 2.0 Flash',        tier: 'Free' },
+    { value: 'gemini-2.0-flash-lite',       label: 'Gemini 2.0 Flash Lite',   tier: 'Free' },
+    { value: 'gemini-1.5-flash',            label: 'Gemini 1.5 Flash',        tier: 'Free' },
+    { value: 'gemini-1.5-flash-8b',         label: 'Gemini 1.5 Flash 8B',     tier: 'Free' },
+    { value: 'gemini-2.5-flash-preview-04-17', label: 'Gemini 2.5 Flash Preview', tier: 'Free' },
+    { value: 'gemini-1.5-pro',              label: 'Gemini 1.5 Pro',          tier: 'Paid' },
+    { value: 'gemini-2.0-pro-exp',          label: 'Gemini 2.0 Pro Exp',      tier: 'Paid' },
   ],
   openai: [
     { value: 'gpt-4o-mini', label: 'GPT-4o Mini (Recommended)' },
@@ -161,7 +166,9 @@ export default function AISettingsModal({ open, onClose, onSaved }: AISettingsMo
                 className="w-full bg-gray-800 text-white text-sm px-3 py-2 rounded-lg border border-gray-600 focus:outline-none focus:border-indigo-500 appearance-none cursor-pointer"
               >
                 {MODELS[provider].map(m => (
-                  <option key={m.value} value={m.value}>{m.label}</option>
+                  <option key={m.value} value={m.value}>
+                    {m.label}{m.tier ? ` · ${m.tier}` : ''}
+                  </option>
                 ))}
               </select>
               <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
