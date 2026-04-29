@@ -1,7 +1,40 @@
 'use client';
 import { useState, useCallback } from 'react';
-import { Bot, Copy, Check, X, Wifi, WifiOff, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
+import { Cpu, Copy, Check, X, Wifi, WifiOff, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
 import { useArchitectureStore } from '@/store/architecture-store';
+
+function ClaudeLogo({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12.0002 2L4.5 7.5V16.5L12.0002 22L19.5 16.5V7.5L12.0002 2Z" fill="#D97757" />
+      <path d="M12 5.5L7 8.75V15.25L12 18.5L17 15.25V8.75L12 5.5Z" fill="#F5A98A" />
+      <path d="M12 8.5L9.5 10V14L12 15.5L14.5 14V10L12 8.5Z" fill="#FDDDD3" />
+    </svg>
+  );
+}
+
+function CursorLogo({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M4 2L20 12L13 13.5L9.5 20L4 2Z" fill="#ffffff" />
+      <path d="M4 2L20 12L13 13.5L9.5 20L4 2Z" stroke="#6B7280" strokeWidth="1" strokeLinejoin="round" />
+      <path d="M13 13.5L16.5 17" stroke="#9CA3AF" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function HttpClientLogo({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="3" width="20" height="3.5" rx="1" fill="#6366F1" />
+      <rect x="2" y="8.5" width="14" height="2" rx="1" fill="#818CF8" />
+      <rect x="2" y="12.5" width="10" height="2" rx="1" fill="#818CF8" />
+      <rect x="2" y="16.5" width="12" height="2" rx="1" fill="#818CF8" />
+      <circle cx="19" cy="18" r="3.5" fill="#10B981" />
+      <path d="M17.5 18L18.5 19L20.5 17" stroke="white" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
 
 interface MCPConnectModalProps {
   onClose: () => void;
@@ -51,7 +84,7 @@ export function MCPConnectModal({ onClose }: MCPConnectModalProps) {
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-700">
           <div className="flex items-center gap-3">
             <div className={`p-2 rounded-lg ${mcpConnected ? 'bg-green-500/20' : 'bg-gray-700'}`}>
-              <Bot className={`w-5 h-5 ${mcpConnected ? 'text-green-400' : 'text-gray-400'}`} />
+              <Cpu className={`w-5 h-5 ${mcpConnected ? 'text-green-400' : 'text-gray-400'}`} />
             </div>
             <div>
               <h2 className="text-white font-semibold text-sm">Connect AI Agent</h2>
@@ -140,10 +173,27 @@ export function MCPConnectModal({ onClose }: MCPConnectModalProps) {
                       onClick={() => setShowInstructions(showInstructions === type ? null : type)}
                       className="w-full flex items-center justify-between px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-800 transition-colors"
                     >
-                      <span>
-                        {type === 'claude' && '🤖 Claude Desktop'}
-                        {type === 'cursor' && '⚡ Cursor / Continue'}
-                        {type === 'custom' && '🔧 Custom HTTP Client'}
+                      <span className="flex items-center gap-2.5">
+                        {type === 'claude' && (
+                          <>
+                            <ClaudeLogo className="w-4 h-4 shrink-0" />
+                            <span>Claude Desktop</span>
+                          </>
+                        )}
+                        {type === 'cursor' && (
+                          <>
+                            <span className="w-4 h-4 shrink-0 flex items-center justify-center bg-gray-900 rounded-sm">
+                              <CursorLogo className="w-3.5 h-3.5" />
+                            </span>
+                            <span>Cursor / Continue</span>
+                          </>
+                        )}
+                        {type === 'custom' && (
+                          <>
+                            <HttpClientLogo className="w-4 h-4 shrink-0" />
+                            <span>Custom HTTP Client</span>
+                          </>
+                        )}
                       </span>
                       {showInstructions === type ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                     </button>
