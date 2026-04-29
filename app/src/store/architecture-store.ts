@@ -88,6 +88,10 @@ interface ArchitectureStore {
   aiApiKey: string;
   aiModel: string;
 
+  // MCP session
+  mcpSessionId: string | null;
+  mcpConnected: boolean;
+
   setProjectName: (name: string) => void;
   addModule: (module: Omit<Module, 'id'>) => void;
   updateModule: (id: string, updates: Partial<Module>) => void;
@@ -104,6 +108,12 @@ interface ArchitectureStore {
   setAiMode: (enabled: boolean) => void;
   setAiConfig: (provider: AIProvider, apiKey: string, model: string) => void;
   clearAiConfig: () => void;
+
+  // MCP actions
+  startMcpSession: () => Promise<string>;
+  stopMcpSession: () => void;
+  pushSessionState: () => Promise<void>;
+  pullSessionState: () => Promise<boolean>;
 }
 
 export const useArchitectureStore = create<ArchitectureStore>()(
@@ -121,6 +131,10 @@ export const useArchitectureStore = create<ArchitectureStore>()(
       aiProvider: 'gemini' as AIProvider,
       aiApiKey: (typeof window !== 'undefined' ? localStorage.getItem('ai_api_key') : null) ?? '',
       aiModel: 'gemini-2.5-flash',
+
+      // MCP defaults
+      mcpSessionId: null,
+      mcpConnected: false,
 
       setProjectName: (name) => set({ projectName: name }),
 
@@ -228,6 +242,54 @@ export const useArchitectureStore = create<ArchitectureStore>()(
         }
         set({ aiMode: false, aiProvider: 'gemini', aiModel: 'gemini-2.5-flash', aiApiKey: '' });
       },
+
+      // MCP actions
+      startMcpSession: async () => {
+        const res = await fetch('/api/session/new');
+        const { sessionId } = await res.json() as { sessionId: string };
+        set({ mcpSessionId: sessionId, mcpConnected: true });
+        // Push current state immediately
+        const { projectName, modules, dependencies } = get();
+        await fetch(`/api/session/${sessionId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ projectName, modules, dependencies, lastUpdatedAt: new Date().toISOString(), lastUpdatedBy: 'browser' }),
+        });
+        return sessionId;
+      },
+
+      stopMcpSession: () => {
+        set({ mcpSessionId: null, mcpConnected: false });
+      },
+
+      pushSessionState: async () => {
+        const { mcpSessionId, projectName, modules, dependencies } = get();
+        if (!mcpSessionId) return;
+        await fetch(`/api/session/${mcpSessionId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ projectName, modules, dependencies, lastUpdatedAt: new Date().toISOString(), lastUpdatedBy: 'browser' }),
+        });
+      },
+
+      pullSessionState: async () => {
+        const { mcpSessionId } = get();
+        if (!mcpSessionId) return false;
+        try {
+          const res = await fetch(`/api/session/${mcpSessionId}`);
+          if (!res.ok) return false;
+          const remote = await res.json() as { projectName: string; modules: Module[]; dependencies: Dependency[]; lastUpdatedBy: string; lastUpdatedAt: string };
+          if (remote.lastUpdatedBy !== 'agent') return false;
+          // Apply remote changes and re-validate
+          set({ projectName: remote.projectName, modules: remote.modules, dependencies: remote.dependencies });
+          get().validateAll();
+          // Mark as seen by pushing browser update
+          await get().pushSessionState();
+          return true;
+        } catch {
+          return false;
+        }
+      },
     }),
     {
       name: 'outsystems-architecture',
@@ -242,6 +304,7 @@ export const useArchitectureStore = create<ArchitectureStore>()(
         aiProvider: state.aiProvider,
         aiModel: state.aiModel,
         // aiApiKey intentionally excluded — stored separately in localStorage
+        // mcpSessionId / mcpConnected intentionally excluded — ephemeral per browser tab
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {

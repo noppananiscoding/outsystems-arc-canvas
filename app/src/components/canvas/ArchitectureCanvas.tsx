@@ -32,6 +32,7 @@ export default function ArchitectureCanvas() {
     addDependency, deleteDependency, loadSampleData, isInitialized,
     validateAll, updateModule, selectModule, deleteModule,
     projectName, violations, aiMode, aiProvider, aiApiKey, aiModel,
+    mcpConnected, mcpSessionId, pullSessionState, pushSessionState,
   } = useArchitectureStore();
 
   const [showForm, setShowForm] = useState(false);
@@ -47,6 +48,8 @@ export default function ArchitectureCanvas() {
   const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
   // Separate highlight state — used by ValidationPanel to highlight without opening the form
   const [highlightModuleId, setHighlightModuleId] = useState<string | null>(null);
+  // Agent activity indicator
+  const [agentEditing, setAgentEditing] = useState(false);
 
   useEffect(() => {
     if (!isInitialized) {
@@ -55,6 +58,19 @@ export default function ArchitectureCanvas() {
       validateAll();
     }
   }, [isInitialized, loadSampleData, validateAll]);
+
+  // MCP polling — pull remote agent changes every 3 seconds when connected
+  useEffect(() => {
+    if (!mcpConnected || !mcpSessionId) return;
+    const intervalId = setInterval(async () => {
+      const changed = await pullSessionState();
+      if (changed) {
+        setAgentEditing(true);
+        setTimeout(() => setAgentEditing(false), 3000);
+      }
+    }, 3000);
+    return () => clearInterval(intervalId);
+  }, [mcpConnected, mcpSessionId, pullSessionState]);
 
   // Shared export function used by toolbar and keyboard shortcut
   const handleExport = useCallback(() => {
@@ -260,6 +276,17 @@ export default function ArchitectureCanvas() {
         onOpenReview={() => setShowReviewPanel(true)}
         onOpenGenerate={() => setShowGenerateDialog(true)}
       />
+
+      {/* Agent editing indicator */}
+      {agentEditing && (
+        <div className="fixed top-12 left-1/2 -translate-x-1/2 z-[60] flex items-center gap-2 bg-green-600/90 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-full shadow-lg border border-green-500/50 animate-bounce">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-300 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-200"></span>
+          </span>
+          Agent is updating the canvas…
+        </div>
+      )}
 
       <div className="flex flex-1 overflow-hidden relative">
         <div className="flex-1 relative">
